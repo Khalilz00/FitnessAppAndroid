@@ -9,6 +9,7 @@
   "author": "khalilz00, vinc3yz",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "postgres": "^3.4.4"
   }
 }
