@@ -6,7 +6,7 @@ const postgres = require('postgres')
 
 async function getSessions() {
   const sql = postgres('postgres://fitnessapp:test@localhost:5432/fitness')
-  const sessions = await sql`SELECT * FROM exercise`
+  const sessions = await sql`SELECT * FROM session`
   // Convert to json and return
   return sessions
 }
