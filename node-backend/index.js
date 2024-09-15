@@ -30,7 +30,7 @@ app.get('/get-sessions', (req, res) => {
 })
 
 app.get('/get-excercises', (req, res) => {
-  getSessions().then((excercises) => {
+  getExcercises().then((excercises) => {
     res.json(excercises)
   })
 })
