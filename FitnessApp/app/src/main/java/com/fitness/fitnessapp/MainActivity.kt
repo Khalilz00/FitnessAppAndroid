@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     showSplash = false
                 }
             } else {
-                ExerciseScreen()
+                HomeScreen()
             }
         }
     }

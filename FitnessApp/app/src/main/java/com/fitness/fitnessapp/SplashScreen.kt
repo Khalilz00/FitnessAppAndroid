@@ -22,7 +22,7 @@ import okio.Timeout
 fun SplashScreen(onTimeout : () -> Unit) {
     //Timer 2 seconds
     LaunchedEffect(Unit) {
-        delay(4000)
+        delay(2000)
         onTimeout()
     }
 
