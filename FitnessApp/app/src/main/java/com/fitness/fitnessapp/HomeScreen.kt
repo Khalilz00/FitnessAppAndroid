@@ -41,6 +41,7 @@ fun HomeScreen(){
             )
         }
 
+        SessionsCarousel()
         // Now, ExerciseScreen is placed below the Row
         ExerciseScreen()
         MyActivity()
