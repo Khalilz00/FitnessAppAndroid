@@ -9,6 +9,6 @@ interface ApiService {
     @GET("/get-excercises")
     fun getExercises(): Call<List<Exercise>>
 
-    @GET("/sessions")
+    @GET("/get-sessions")
     fun getSessions(): Call<List<Session>>
 }

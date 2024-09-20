@@ -24,7 +24,7 @@ fun ExerciseScreen(modifier: Modifier = Modifier) {
 
     // Appeler Retrofit pour récupérer les exercices
     LaunchedEffect(Unit) {
-        RetrofitClient.instance.getExercises().enqueue(object : Callback<List<Exercise>> {
+        RetrofitClient.apiService.getExercises().enqueue(object : Callback<List<Exercise>> {
             override fun onResponse(call: Call<List<Exercise>>, response: Response<List<Exercise>>) {
                 if (response.isSuccessful) {
                     val body = response.body()
