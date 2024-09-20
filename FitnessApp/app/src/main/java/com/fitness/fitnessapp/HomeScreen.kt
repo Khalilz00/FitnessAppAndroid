@@ -19,10 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(navController: NavController){
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -48,7 +49,7 @@ fun HomeScreen(){
             contentPadding = PaddingValues(16.dp),  // Optional padding
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
-            item {SessionsCarousel()}
+            item {SessionsCarousel(navController)}
             // Now, ExerciseScreen is placed below the Row
 
             item {MyActivity()}

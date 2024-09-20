@@ -2,6 +2,7 @@ package com.fitness.fitnessapp
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import model.Session
 import network.RetrofitClient
@@ -46,7 +48,7 @@ import retrofit2.Response
 
 
 @Composable
-fun SessionsCarousel() {
+fun SessionsCarousel(navController: NavController) {
     val context = LocalContext.current
     var sessions by remember { mutableStateOf<List<Session>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -96,7 +98,9 @@ fun SessionsCarousel() {
                     SessionCard(session)
                 }
                 item {
-                    AddSessionCard()
+                    AddSessionCard(onClick = {
+                        navController.navigate("create-session")
+                    })
                 }
             }
         }
@@ -140,7 +144,7 @@ fun SessionCard(session: Session){
 }
 
 @Composable
-fun AddSessionCard(){
+fun AddSessionCard(onClick: ()-> Unit){
     Card(
         modifier = Modifier
             .width(130.dp)
@@ -159,7 +163,9 @@ fun AddSessionCard(){
             Icon(
                 painter = painterResource(id = R.drawable.baseline_add_circle_24),
                 contentDescription = "Add Session",
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable { onClick() },
                 tint = MaterialTheme.colorScheme.primary
 
 
