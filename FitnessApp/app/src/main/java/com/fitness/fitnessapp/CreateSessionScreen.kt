@@ -57,6 +57,8 @@ fun CreateSessionScreen() {
 
     var exercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
     var isLoadingExercises by remember { mutableStateOf(false) }
+
+    var selectedExercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
     LaunchedEffect(Unit) {
         RetrofitClient.apiService.getMuscles().enqueue(object : Callback<List<Muscle>> {
             override fun onResponse(call: Call<List<Muscle>>, response: Response<List<Muscle>>){
@@ -95,6 +97,17 @@ fun CreateSessionScreen() {
             }
 
         })
+    }
+
+    fun toggleExerciseSelection(exercise: Exercise){
+        if(selectedExercises.contains(exercise)) {
+            selectedExercises = selectedExercises.filter {it != exercise}
+        } else {
+            selectedExercises = selectedExercises + exercise
+        }
+    }
+    fun removeExercise(exercise : Exercise){
+        selectedExercises = selectedExercises.filter { it != exercise}
     }
 
     Column(
@@ -170,16 +183,16 @@ fun CreateSessionScreen() {
             ) {
                 items(exercises.size) { index ->
                     val exercise = exercises[index]
-                    Text(
-                        text = exercise.name,
-                        fontSize = 18.sp,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp, horizontal = 16.dp)
-                    )
+                    val isSelected = selectedExercises.contains(exercise)
+                    ExerciseItem( exercise = exercise , isSelected = isSelected , onClick = {toggleExerciseSelection(exercise)})
                 }
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+        SelectedExercisesButton(
+            selectedExercises = selectedExercises,
+            onRemoveExercise = {exercise -> removeExercise(exercise)})
     }
 }
 
