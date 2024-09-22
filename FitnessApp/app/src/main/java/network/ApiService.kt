@@ -5,6 +5,10 @@ import retrofit2.http.GET
 import model.Exercise
 import model.Muscle
 import model.Session
+import model.SessionRequest
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
@@ -20,5 +24,7 @@ interface ApiService {
     @GET("/get-exercises-by-muscle")
     fun getExercisesForMuscle(@Query("muscle") muscle: String): Call<List<Exercise>>
 
+    @POST("/create-session")
+    fun createSession(@Body sessionData: SessionRequest): Call<Response<Unit>>
 
 }

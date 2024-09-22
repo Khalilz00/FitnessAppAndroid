@@ -1,6 +1,7 @@
 package com.fitness.fitnessapp
 
 import android.graphics.Paint.Align
+import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -134,7 +136,10 @@ fun ExerciseDetailsDialog(exercise : Exercise, onDismiss:()-> Unit){
 @Composable
 fun SelectedExercisesButton(
     selectedExercises : List<Exercise>,
-    onRemoveExercise: (Exercise) -> Unit
+    onRemoveExercise: (Exercise) -> Unit,
+    sessionTitle: String,
+    onCreateSession: () -> Unit
+
 ){
     var showDialog by remember { mutableStateOf(false) }
 
@@ -169,6 +174,34 @@ fun SelectedExercisesButton(
                                     }
                                 )
                             }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if(sessionTitle.isNotEmpty()&& selectedExercises.isNotEmpty()){
+                            Surface (
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp)
+                                    .clickable { onCreateSession() },
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(8.dp)
+                            ){
+                                Text(
+                                    text = "Create Session",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(16.dp),
+                                    fontSize = 18.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }else {
+                            Text(
+                                text = "Enter a session title and select exercises",
+                                color = Color.Gray,
+                                modifier = Modifier.padding(top = 16.dp),
+                                fontSize = 14.sp
+                            )
                         }
                     }
             }

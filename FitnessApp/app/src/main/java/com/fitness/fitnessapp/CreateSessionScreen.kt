@@ -41,10 +41,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import model.Exercise
 import model.Muscle
+import model.SessionRequest
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 
 @Composable
 fun CreateSessionScreen() {
@@ -110,6 +112,29 @@ fun CreateSessionScreen() {
         selectedExercises = selectedExercises.filter { it != exercise}
     }
 
+    fun createSession(){
+        val sessionData = SessionRequest(
+            sessionTitle = sessionTitle,
+            exercises= selectedExercises.map { it.id }
+        )
+
+        RetrofitClient.apiService.createSession(sessionData).enqueue(object : Callback<Response<Unit>> {
+            override fun onResponse(call: Call<Response<Unit>>, response: Response<Response<Unit>>){
+                if (response.isSuccessful) {
+                    Log.d("Retrofit", "Session created successfully")
+                    sessionTitle = ""
+                    selectedExercises = emptyList()
+                } else {
+                    Log.e("Retrofit", "Failed to create session")
+                }
+            }
+
+            override fun onFailure ( call : Call<Response<Unit>>, t: Throwable){
+                Log.e("Retrofit", "Error creating session: ${t.message}")
+
+            }
+        })
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -192,7 +217,9 @@ fun CreateSessionScreen() {
         Spacer(modifier = Modifier.height(16.dp))
         SelectedExercisesButton(
             selectedExercises = selectedExercises,
-            onRemoveExercise = {exercise -> removeExercise(exercise)})
+            onRemoveExercise = {exercise -> removeExercise(exercise)},
+            sessionTitle = sessionTitle,
+            onCreateSession = {createSession()})
     }
 }
 
