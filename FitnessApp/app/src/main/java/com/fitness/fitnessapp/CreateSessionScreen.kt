@@ -1,10 +1,10 @@
 package com.fitness.fitnessapp
 
-import android.graphics.Paint.Align
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -46,21 +46,67 @@ import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 
 @Composable
 fun CreateSessionScreen() {
     var sessionTitle by remember { mutableStateOf("") }
-    var selectedImagesRes by remember { mutableStateOf(R.drawable.add_image_icon) }
+    var selectedImagesRes by remember { mutableStateOf(R.drawable.add) }
     var showImagePicker by remember { mutableStateOf(false) }
 
-    var selectedMuscle by remember { mutableStateOf("Cardio") }
+    var selectedMuscle by remember { mutableStateOf("All") }
     var muscles by remember { mutableStateOf<List<String>>(emptyList()) }
 
     var exercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
     var isLoadingExercises by remember { mutableStateOf(false) }
 
     var selectedExercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
+    fun fetchExercises(muscle : String){
+        isLoadingExercises = true
+        if (muscle == "All") {
+            RetrofitClient.apiService.getExercises().enqueue(object : Callback<List<Exercise>> {
+                override fun onResponse(call: Call<List<Exercise>>, response : Response<List<Exercise>>){
+                    if (response.isSuccessful){
+                        exercises = response.body() ?: emptyList()
+                        Log.d("Retrofit", "Fetched exercises: $exercises")
+                    } else {
+                        Log.e("Retrofit", "Failed to fetch exercises")
+                    }
+                    isLoadingExercises = false
+                }
+                override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+                    Log.e("Retrofit", "Error fetching exercises: ${t.message}")
+                    isLoadingExercises = false
+                }
+
+            })
+
+
+        }else {
+
+            RetrofitClient.apiService.getExercisesForMuscle(muscle).enqueue(object : Callback<List<Exercise>> {
+                override fun onResponse(call: Call<List<Exercise>>, response : Response<List<Exercise>>){
+                    if (response.isSuccessful){
+                        exercises = response.body() ?: emptyList()
+                        Log.d("Retrofit", "Fetched exercises: $exercises")
+                    } else {
+                        Log.e("Retrofit", "Failed to fetch exercises")
+                    }
+                    isLoadingExercises = false
+                }
+                override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+                    Log.e("Retrofit", "Error fetching exercises: ${t.message}")
+                    isLoadingExercises = false
+                }
+
+            })
+
+        }
+
+        Log.d("Retrofit", "Fetching exercises for muscle: $muscle") // debugging
+
+
+    }
+
     LaunchedEffect(Unit) {
         RetrofitClient.apiService.getMuscles().enqueue(object : Callback<List<Muscle>> {
             override fun onResponse(call: Call<List<Muscle>>, response: Response<List<Muscle>>){
@@ -77,29 +123,10 @@ fun CreateSessionScreen() {
 
 
         })
+        fetchExercises("All")
     }
 
-    fun fetchExercises(muscle : String){
-        isLoadingExercises = true
-        Log.d("Retrofit", "Fetching exercises for muscle: $muscle") // debugging
 
-        RetrofitClient.apiService.getExercisesForMuscle(muscle).enqueue(object : Callback<List<Exercise>> {
-            override fun onResponse(call: Call<List<Exercise>>, response : Response<List<Exercise>>){
-                if (response.isSuccessful){
-                    exercises = response.body() ?: emptyList()
-                    Log.d("Retrofit", "Fetched exercises: $exercises")
-                } else {
-                    Log.e("Retrofit", "Failed to fetch exercises")
-                }
-                isLoadingExercises = false
-            }
-            override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
-                Log.e("Retrofit", "Error fetching exercises: ${t.message}")
-                isLoadingExercises = false
-            }
-
-        })
-    }
 
     fun toggleExerciseSelection(exercise: Exercise){
         if(selectedExercises.contains(exercise)) {
@@ -135,92 +162,104 @@ fun CreateSessionScreen() {
             }
         })
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Create a New Session",
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
 
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Image(
-                painter = painterResource(id = selectedImagesRes),
-                contentDescription = "Select image",
-                modifier = Modifier
-                    .size(55.dp)
-                    .clip(CircleShape)
-                    .clickable { showImagePicker = true },
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            TextField(
-                value = sessionTitle,
-                onValueChange = {sessionTitle= it},
-                label = { Text("Session title") },
-                placeholder = { Text("Enter session title...") },
-                singleLine = true ,
+            Text(
+                text = "Create a New Session",
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
             )
-        }
-        if (showImagePicker){
-            ImagePickerDialog(onImageSelected = { imageRes ->
-                selectedImagesRes = imageRes
-                showImagePicker = false
-            },
-                onDismiss = {showImagePicker = false})
+            Row(
+                modifier = Modifier.fillMaxWidth(),
 
-        }
-        if(muscles.isEmpty()) {
-            Text(text = "Loading muscles...", modifier = Modifier.padding(16.dp))
-        } else {
+                ) {
+                Image(
+                    painter = painterResource(id = selectedImagesRes),
+                    contentDescription = "Select image",
+                    modifier = Modifier
+                        .size(55.dp)
+                        .clip(CircleShape)
+                        .clickable { showImagePicker = true },
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                TextField(
+                    value = sessionTitle,
+                    onValueChange = {sessionTitle= it},
+                    label = { Text("Session title") },
+                    placeholder = { Text("Enter session title...") },
+                    singleLine = true ,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+            }
+            if (showImagePicker){
+                ImagePickerDialog(onImageSelected = { imageRes ->
+                    selectedImagesRes = imageRes
+                    showImagePicker = false
+                },
+                    onDismiss = {showImagePicker = false})
 
-            MuscleFilter(
-                muscles = muscles,
-                selectedMuscle = selectedMuscle,
-                onMuscleSelected = { muscle ->
-                    selectedMuscle = muscle
-                    fetchExercises(muscle)
+            }
+            if(muscles.isEmpty()) {
+                Text(text = "Loading muscles...", modifier = Modifier.padding(16.dp))
+            } else {
+
+                MuscleFilter(
+                    muscles = muscles,
+                    selectedMuscle = selectedMuscle,
+                    onMuscleSelected = { muscle ->
+                        selectedMuscle = muscle
+                        fetchExercises(muscle)
+                    }
+                )
+            }
+
+            if (isLoadingExercises) {
+                Text(text = "Loading exercises...", modifier = Modifier.padding(16.dp))
+            } else if (exercises.isEmpty()) {
+                Text(text = "No exercises found.", modifier = Modifier.padding(16.dp))
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(top = 16.dp)
+                ) {
+                    items(exercises.size) { index ->
+                        val exercise = exercises[index]
+                        val isSelected = selectedExercises.contains(exercise)
+                        ExerciseItem( exercise = exercise , isSelected = isSelected , onClick = {toggleExerciseSelection(exercise)})
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+        }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ){
+            SelectedExercisesButton(
+                selectedExercises = selectedExercises,
+                onRemoveExercise = {exercise -> removeExercise(exercise)},
+                sessionTitle = sessionTitle,
+                onCreateSession = {createSession()},
             )
         }
 
-        if (isLoadingExercises) {
-            Text(text = "Loading exercises...", modifier = Modifier.padding(16.dp))
-        } else if (exercises.isEmpty()) {
-            Text(text = "No exercises found.", modifier = Modifier.padding(16.dp))
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(top = 16.dp)
-            ) {
-                items(exercises.size) { index ->
-                    val exercise = exercises[index]
-                    val isSelected = selectedExercises.contains(exercise)
-                    ExerciseItem( exercise = exercise , isSelected = isSelected , onClick = {toggleExerciseSelection(exercise)})
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        SelectedExercisesButton(
-            selectedExercises = selectedExercises,
-            onRemoveExercise = {exercise -> removeExercise(exercise)},
-            sessionTitle = sessionTitle,
-            onCreateSession = {createSession()})
     }
+
 }
 
 @Composable
@@ -311,14 +350,33 @@ fun MuscleFilter(
     selectedMuscle: String,
     onMuscleSelected: (String) -> Unit
 ){
+    val allMuscles = listOf("All") + muscles
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        items(muscles.size) { index ->
-            val muscle = muscles[index]
+
+        fun getMuscleImageRes(muscle: String): Int {
+            return when (muscle) {
+                "All" -> R.drawable.all
+                "legs" -> R.drawable.legs
+                "arms" -> R.drawable.arms
+                "chest" -> R.drawable.chest
+                "core" -> R.drawable.core
+                "back" -> R.drawable.back
+                "shoulders" -> R.drawable.shoulders
+                "triceps" -> R.drawable.triceps
+                "biceps" -> R.drawable.biceps
+                "full body" -> R.drawable.fullbody
+
+                else -> R.drawable.running
+            }
+        }
+        items(allMuscles.size) { index ->
+            val muscle = allMuscles[index]
+
             CategoryItem(
-                imageRes = R.drawable.squat,
+                imageRes = getMuscleImageRes(muscle),
                 text = muscle,
                 isSelected = muscle == selectedMuscle,
                 onClick = { onMuscleSelected(muscle)}

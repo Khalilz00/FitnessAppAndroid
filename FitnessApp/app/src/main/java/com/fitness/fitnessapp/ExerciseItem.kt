@@ -4,9 +4,11 @@ import android.graphics.Paint.Align
 import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -143,14 +146,29 @@ fun SelectedExercisesButton(
 ){
     var showDialog by remember { mutableStateOf(false) }
 
-    Text(
+    /* Text(
         text = "selected",
         modifier = Modifier
             .clickable { showDialog = true }
             .padding(16.dp)
             .fillMaxWidth(),
         color = MaterialTheme.colorScheme.primary
-    )
+    ) */
+
+        FloatingActionButton(
+            onClick = {showDialog = true},
+            modifier = Modifier
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+        ) {
+            Text(
+                text= "Add ${selectedExercises.size} exercises",
+                modifier = Modifier.padding(16.dp),
+                color = Color.White
+            )
+
+        }
+
 
     if (showDialog){
         Dialog(onDismissRequest = {showDialog = false }) {
