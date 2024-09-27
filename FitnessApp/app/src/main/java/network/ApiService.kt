@@ -27,4 +27,8 @@ interface ApiService {
     @POST("/create-session")
     fun createSession(@Body sessionData: SessionRequest): Call<Response<Unit>>
 
+    @GET("/get-images")
+    fun getImages(): Call<List<String>>
+
+
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
 import model.Exercise
 import model.Muscle
 import model.SessionRequest
@@ -50,8 +51,11 @@ import retrofit2.Response
 @Composable
 fun CreateSessionScreen() {
     var sessionTitle by remember { mutableStateOf("") }
-    var selectedImagesRes by remember { mutableStateOf(R.drawable.add) }
+
+    var selectedImageUrl by remember { mutableStateOf("") }
     var showImagePicker by remember { mutableStateOf(false) }
+    var imageUrls by remember { mutableStateOf<List<String>>(emptyList()) }
+
 
     var selectedMuscle by remember { mutableStateOf("All") }
     var muscles by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -107,7 +111,25 @@ fun CreateSessionScreen() {
 
     }
 
+    fun fetchImages(){
+        RetrofitClient.apiService.getImages().enqueue(object  : Callback<List<String>>{
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful){
+                    imageUrls = response.body() ?: emptyList()
+                    Log.d("Retrofit", "Fetched images: $imageUrls")
+                } else {
+                    Log.e("Retrofit", "Failed to fetch images. Response code: ${response.code()} Response message: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                Log.e("Retrofit", "Error fetching images: ${t.message}")
+            }
+        })
+    }
+
     LaunchedEffect(Unit) {
+        fetchImages()
         RetrofitClient.apiService.getMuscles().enqueue(object : Callback<List<Muscle>> {
             override fun onResponse(call: Call<List<Muscle>>, response: Response<List<Muscle>>){
                 if (response.isSuccessful){
@@ -140,9 +162,11 @@ fun CreateSessionScreen() {
     }
 
     fun createSession(){
+
         val sessionData = SessionRequest(
             sessionTitle = sessionTitle,
-            exercises= selectedExercises.map { it.id }
+            exercises= selectedExercises.map { it.id },
+
         )
 
         RetrofitClient.apiService.createSession(sessionData).enqueue(object : Callback<Response<Unit>> {
@@ -184,7 +208,12 @@ fun CreateSessionScreen() {
 
                 ) {
                 Image(
-                    painter = painterResource(id = selectedImagesRes),
+                    painter = rememberAsyncImagePainter(
+                        model = if (selectedImageUrl.isNotEmpty()) selectedImageUrl else "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
+                        placeholder = painterResource(R.drawable.add), // Replace with your local placeholder drawable
+                        error = painterResource(R.drawable.add)
+
+                    ),
                     contentDescription = "Select image",
                     modifier = Modifier
                         .size(55.dp)
@@ -205,10 +234,10 @@ fun CreateSessionScreen() {
                 )
             }
             if (showImagePicker){
-                ImagePickerDialog(onImageSelected = { imageRes ->
-                    selectedImagesRes = imageRes
+                ImagePickerDialog(onImageSelected = { imageUrl ->
+                    selectedImageUrl = imageUrl
                     showImagePicker = false
-                },
+                },imageUrls = imageUrls,
                     onDismiss = {showImagePicker = false})
 
             }
@@ -262,9 +291,9 @@ fun CreateSessionScreen() {
 
 @Composable
 fun ImagePickerDialog(
-    onImageSelected: (Int) -> Unit,
+    onImageSelected: (String) -> Unit,
+    imageUrls : List<String>,
     onDismiss: () -> Unit ) {
-    val images = listOf(R.drawable.backex,R.drawable.squat)
 
     Dialog(onDismissRequest = {onDismiss()}) {
         Surface(
@@ -286,15 +315,15 @@ fun ImagePickerDialog(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    images.forEach { imageRes ->
+                    imageUrls.forEach { imageUrl ->
 
                         Image(
-                            painter = painterResource(id = imageRes),
+                            painter = rememberAsyncImagePainter(imageUrl),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .clickable { onImageSelected(imageRes) },
+                                .clickable { onImageSelected(imageUrl) },
                             contentScale = ContentScale.Crop
                         )
 

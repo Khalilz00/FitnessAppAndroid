@@ -92,14 +92,14 @@ app.post('/create-session', async (req, res) => {
       VALUES (${sessionTitle})
       RETURNING id
     `;
-    
+
     // Insert each exercise into the session_exercise table
     await Promise.all(
-      exercises.map(exerciseId => 
+      exercises.map(exerciseId =>
         sql`INSERT INTO session_exercise (session_id, exercise_id) VALUES (${session[0].id}, ${exerciseId})`
       )
     );
-    
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error creating session:', err);
@@ -107,6 +107,17 @@ app.post('/create-session', async (req, res) => {
   }
 });
 
+
+app.get('/get-images', async (req, res) => {
+  try {
+    const images = await sql`SELECT url FROM images`; // Assuming `sql` is your postgres connection
+    const urls = images.map(image => image.url); // Extract just the URL
+    res.json(urls); // Send the array of URLs
+  } catch (error) {
+    console.error('Failed to fetch images:', error);
+    res.status(500).send('Server error');
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
