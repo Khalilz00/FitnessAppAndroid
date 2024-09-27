@@ -233,7 +233,7 @@ fun CreateSessionScreen() {
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(top = 16.dp)
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 110.dp)
                 ) {
                     items(exercises.size) { index ->
                         val exercise = exercises[index]
@@ -242,8 +242,6 @@ fun CreateSessionScreen() {
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
         }
         Box(

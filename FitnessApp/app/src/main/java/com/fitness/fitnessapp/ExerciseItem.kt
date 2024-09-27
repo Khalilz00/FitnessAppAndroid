@@ -146,19 +146,13 @@ fun SelectedExercisesButton(
 ){
     var showDialog by remember { mutableStateOf(false) }
 
-    /* Text(
-        text = "selected",
-        modifier = Modifier
-            .clickable { showDialog = true }
-            .padding(16.dp)
-            .fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primary
-    ) */
 
         FloatingActionButton(
             onClick = {showDialog = true},
             modifier = Modifier
-                .padding(16.dp),
+                .padding(
+                    bottom = 72.dp, start = 16.dp, end = 16.dp
+                ),
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
         ) {
             Text(
