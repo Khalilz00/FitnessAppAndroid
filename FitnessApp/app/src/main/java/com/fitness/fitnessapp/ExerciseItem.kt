@@ -150,8 +150,9 @@ fun SelectedExercisesButton(
         FloatingActionButton(
             onClick = {showDialog = true},
             modifier = Modifier
+
                 .padding(
-                    bottom = 72.dp, start = 16.dp, end = 16.dp
+                    bottom = 120.dp, start = 250.dp, end = 16.dp
                 ),
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
         ) {
@@ -173,6 +174,8 @@ fun SelectedExercisesButton(
             ) {
                     Column(modifier = Modifier.padding(16.dp) ){
                         Text( text = "Selected Exercises", fontSize = 20.sp)
+
+                        Spacer(modifier = Modifier.height(20.dp))
                         selectedExercises.forEach{
                             exercise ->
                             Row (modifier = Modifier.padding(vertical = 4.dp)){

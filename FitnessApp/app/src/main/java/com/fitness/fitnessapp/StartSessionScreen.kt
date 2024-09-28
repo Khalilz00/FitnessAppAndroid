@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -129,6 +130,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -178,6 +180,8 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
             }
 
+            Spacer(modifier = Modifier.height(50.dp))
+
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -207,7 +211,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                 ) {
                     Text(
                         text = "Start workout",
-                        color = Color.White,
+                        color = Color.DarkGray,
                         fontSize = 40.sp,
                         textAlign = TextAlign.Center
                     )
@@ -318,7 +322,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
 @Composable
 fun ExerciseElement(exercise: Exercise, isCurrent: Boolean, onDoneClicked: () -> Unit) {
-    val backgroundColor = if (isCurrent) MaterialTheme.colorScheme.primary else Color.LightGray
+    val backgroundColor = if (isCurrent) Color.DarkGray else Color.LightGray
 
     Card(
         modifier = Modifier
@@ -378,13 +382,14 @@ fun ExerciseElement(exercise: Exercise, isCurrent: Boolean, onDoneClicked: () ->
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Centered Done button
+                // Done button
                 IconButton(
                     onClick = { onDoneClicked() },
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(MaterialTheme.colorScheme.secondary)
+                        .width(70.dp)  // Set the desired width
+                        .height(45.dp)  // Set the desired height
+                        .clip(RoundedCornerShape(12.dp))  // You can adjust the corner radius as needed
+                        .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = "Done",
@@ -393,6 +398,7 @@ fun ExerciseElement(exercise: Exercise, isCurrent: Boolean, onDoneClicked: () ->
                         fontSize = 16.sp
                     )
                 }
+
             } else {
                 // Compact view for non-current exercises
                 Row(
