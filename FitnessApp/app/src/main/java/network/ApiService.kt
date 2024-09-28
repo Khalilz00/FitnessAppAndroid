@@ -1,6 +1,7 @@
 package network
 
 import model.Activity
+import model.ActivitySubmission
 import retrofit2.Call
 import retrofit2.http.GET
 import model.Exercise
@@ -39,6 +40,14 @@ interface ApiService {
     fun getSessionExercises(@Query("sessionId") sessionId: String): Call<List<Exercise>>
 
     @POST("/save-activity")
-    fun saveSessionActivity(@Body activity: Activity): Call<Unit>
+    fun saveSessionActivity(@Body activity: ActivitySubmission): Call<Unit>
+
+    @GET("/get-activities")
+    fun getActivities(): Call<List<Activity>>
+
+
+    @GET("/get-session/{id}")
+    fun getSessionById(@Path("id") sessionId: Int): Call<Session>
+
 
 }

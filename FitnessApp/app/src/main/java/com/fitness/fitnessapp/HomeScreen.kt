@@ -55,7 +55,7 @@ fun HomeScreen(navController: NavController){
             // Now, ExerciseScreen is placed below the Row
 
             item {MyActivity()}
-            item {ExerciseScreen()}
+
             }
 
 

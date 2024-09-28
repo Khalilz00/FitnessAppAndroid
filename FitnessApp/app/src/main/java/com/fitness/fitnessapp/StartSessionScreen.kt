@@ -45,11 +45,14 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import kotlinx.coroutines.delay
 import model.Activity
+import model.ActivitySubmission
 import model.Exercise
 import network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -262,10 +265,13 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                     Spacer(modifier = Modifier.height(50.dp))
                     IconButton(
                         onClick = {
-                            // Save activity when session completes
-                            val activityData = Activity(
+                            val currentDate = LocalDateTime.now()
+
+                            val activityData = ActivitySubmission(
                                 sessionId = sessionId?.toInt() ?: 0,  // Handle nullability of sessionId
-                                duration = elapsedTime.toInt()  // Duration in seconds
+                                duration = elapsedTime.toInt(),
+                                notes = "No notes",
+                                date = currentDate
                             )
 
                             RetrofitClient.apiService.saveSessionActivity(activityData).enqueue(object :
@@ -288,7 +294,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
                             // Reset sessionComplete or navigate to another screen
                             sessionComplete = false
-                        }, // Close dialog
+                        },
                         modifier = Modifier
                             .size(30.dp)
                             .clip(RoundedCornerShape(8.dp))
@@ -300,6 +306,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                             fontSize = 16.sp
                         )
                     }
+
                 }
             }
         }
