@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.delay
+import java.util.Locale
+
 
 @Composable
 fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: String) {
@@ -43,6 +47,28 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
     var isOverlayVisible by remember { mutableStateOf(true) }
 
+    var startTime by remember { mutableStateOf(0L) }
+    var timerRunning by remember { mutableStateOf(false) }
+    var currentTime by remember { mutableStateOf(0L) }
+
+    LaunchedEffect(timerRunning) {
+        if(timerRunning)  {
+            startTime = System.currentTimeMillis()
+            while (timerRunning) {
+                currentTime = System.currentTimeMillis()
+                delay(1000L)
+
+            }
+            }
+    }
+
+    val elapsedTime = (currentTime - startTime) / 1000
+
+    val hours = (elapsedTime / 3600)
+    val minutes = (elapsedTime % 3600) / 60
+    val seconds = (elapsedTime % 60)
+
+    val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -82,10 +108,21 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                     textAlign = TextAlign.Start
                 )
                 Icon(
-                    painter = painterResource(id = R.drawable.playbigger), // Replace with your desired icon resource
-                    contentDescription = "Icon",
-                    tint = MaterialTheme.colorScheme.primary
+                    painter = painterResource(id = R.drawable.timericon), // Replace with your desired icon resource
+                    contentDescription = "timer",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(50.dp)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Display the elapsed time
+                Text(
+                    text = formattedTime,
+                    fontSize = 24.sp,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+
             }
         }
 
@@ -113,7 +150,8 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
                     // Button to dismiss the overlay
                     IconButton(
-                        onClick = { isOverlayVisible = false },
+                        onClick = { isOverlayVisible = false
+                            timerRunning = true},
                         modifier = Modifier
                             .padding(16.dp)
                             .size(100.dp)  // Adjust size as needed
