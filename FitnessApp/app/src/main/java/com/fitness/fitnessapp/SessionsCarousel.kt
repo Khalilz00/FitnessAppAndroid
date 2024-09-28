@@ -1,5 +1,6 @@
 package com.fitness.fitnessapp
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -116,7 +117,8 @@ fun SessionCard(session: Session, navController: NavController){
             .height(150.dp)
             .padding(8.dp)
             .clickable {
-                navController.navigate("start-session/${session.id}")
+                val encodedImageUrl = Uri.encode(session.image_url)
+                navController.navigate("start-session/${session.id}/${session.name}/$encodedImageUrl")
             },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)

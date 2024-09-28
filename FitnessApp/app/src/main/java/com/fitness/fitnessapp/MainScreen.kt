@@ -122,9 +122,11 @@ fun NavigationHost(navController: NavHostController, paddingValues: PaddingValue
         composable("account") { AccountScreen(navController) }
         composable("sessions") { MySessionsScreen(navController) }
         composable("create-session") { CreateSessionScreen() }
-        composable("start-session/{sessionId}") { backStackEntry ->
+        composable("start-session/{sessionId}/{sessionName}/{imageUrl}") { backStackEntry ->
             val sessionId = backStackEntry.arguments?.getString("sessionId")
-            StartSessionScreen(sessionId)
+            val sessionName = backStackEntry.arguments?.getString("sessionName") ?: ""
+            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+            StartSessionScreen(sessionId, sessionName, imageUrl)
         }
     }
 }
