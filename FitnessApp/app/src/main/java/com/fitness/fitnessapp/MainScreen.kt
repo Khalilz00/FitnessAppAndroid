@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
@@ -64,68 +65,53 @@ fun MainScreen(){
 fun BottomNavigationBar(navController: NavHostController) {
     BottomAppBar(
         modifier = Modifier
-
-            .height(100.dp) // Adjust height as needed
-            .padding(
-                bottom = 25.dp,
-                start = 40.dp,
-                end = 40.dp
-            )
-            .clip(
-                RoundedCornerShape(
-                    //topStart = 30.dp,
-                    //topEnd = 30.dp
-                    40.dp
-                )
-            ).fillMaxHeight(),
-             // Optional: Adjust padding if needed
+            .height(80.dp) // Adjust height as needed
+            .padding(bottom = 15.dp, start = 40.dp, end = 40.dp)
+            .clip(RoundedCornerShape(40.dp)),
         contentColor = MaterialTheme.colorScheme.onPrimary,
-        containerColor = Color.Gray // Background color
+        containerColor = Color.Gray  // Background color
     ) {
-        // Use Box to center the Row within the BottomAppBar
-
         Row(
-            modifier = Modifier.fillMaxSize().fillMaxHeight(),
+            modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-             // Centers the content vertically in the Row
-            //modifier = Modifier.fillMaxSize().fillMaxHeight()  //.wrapContentSize()
+            verticalAlignment = Alignment.CenterVertically  // Ensure icons are centered vertically
         ) {
-            // To track the current backstack
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
 
-            TextButton(
-                onClick = { navController.navigate("home") },
-            ) {
+            // Home Button
+            TextButton(onClick = { navController.navigate("home") }) {
                 Icon(
                     imageVector = Icons.Filled.Home,
                     contentDescription = "Home",
+                    modifier = Modifier.size(30.dp),  // Increase icon size
                     tint = if (currentRoute == "home") MaterialTheme.colorScheme.primary else Color.LightGray
                 )
             }
-            TextButton(
-                onClick = { navController.navigate("sessions") },
-            ) {
+
+            // Sessions Button
+            TextButton(onClick = { navController.navigate("sessions") }) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_view_list_24),
-                    contentDescription = "Sesions",
+                    contentDescription = "Sessions",
+                    modifier = Modifier.size(30.dp),  // Increase icon size
                     tint = if (currentRoute == "sessions") MaterialTheme.colorScheme.primary else Color.LightGray
                 )
             }
-            TextButton(
-                onClick = { navController.navigate("account") },
-            ) {
+
+            // Account Button
+            TextButton(onClick = { navController.navigate("account") }) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = "Account",
-                    tint = if (currentRoute == "account") MaterialTheme.colorScheme.primary else Color.LightGray //MaterialTheme.colorScheme.onPrimary
+                    modifier = Modifier.size(30.dp),  // Increase icon size
+                    tint = if (currentRoute == "account") MaterialTheme.colorScheme.primary else Color.LightGray
                 )
             }
         }
     }
-
 }
+
 @Composable
 fun NavigationHost(navController: NavHostController, paddingValues: PaddingValues) {
     NavHost(
@@ -135,6 +121,10 @@ fun NavigationHost(navController: NavHostController, paddingValues: PaddingValue
         composable("home") { HomeScreen(navController) }
         composable("account") { AccountScreen(navController) }
         composable("create-session") { CreateSessionScreen() }
+        composable("start-session/{sessionId}") { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId")
+            StartSessionScreen(sessionId)
+        }
     }
 }
 

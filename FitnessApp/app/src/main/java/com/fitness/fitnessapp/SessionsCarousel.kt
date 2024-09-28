@@ -95,7 +95,7 @@ fun SessionsCarousel(navController: NavController) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(sessions) { session ->
-                    SessionCard(session)
+                    SessionCard(session, navController)
                 }
                 item {
                     AddSessionCard(onClick = {
@@ -109,12 +109,15 @@ fun SessionsCarousel(navController: NavController) {
 
 
 @Composable
-fun SessionCard(session: Session){
+fun SessionCard(session: Session, navController: NavController){
     Card(
         modifier = Modifier
             .width(130.dp)
             .height(150.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                navController.navigate("start-session/${session.id}")
+            },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
