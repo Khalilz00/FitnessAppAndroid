@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import kotlinx.coroutines.delay
+import model.Activity
 import model.Exercise
 import network.RetrofitClient
 import retrofit2.Call
@@ -112,6 +113,11 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
             sessionComplete = true
         }
     }
+
+
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -255,7 +261,34 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                     )
                     Spacer(modifier = Modifier.height(50.dp))
                     IconButton(
-                        onClick = { sessionComplete = false },  // Close dialog
+                        onClick = {
+                            // Save activity when session completes
+                            val activityData = Activity(
+                                sessionId = sessionId?.toInt() ?: 0,  // Handle nullability of sessionId
+                                duration = elapsedTime.toInt()  // Duration in seconds
+                            )
+
+                            RetrofitClient.apiService.saveSessionActivity(activityData).enqueue(object :
+                                Callback<Unit> {
+                                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                                    if (response.isSuccessful) {
+                                        // Log success or display success message
+                                        println("Session activity saved successfully")
+                                    } else {
+                                        // Handle the case when the save fails
+                                        println("Failed to save session activity")
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                                    // Handle network or other failures
+                                    println("Error saving session activity: ${t.message}")
+                                }
+                            })
+
+                            // Reset sessionComplete or navigate to another screen
+                            sessionComplete = false
+                        }, // Close dialog
                         modifier = Modifier
                             .size(30.dp)
                             .clip(RoundedCornerShape(8.dp))

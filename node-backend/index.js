@@ -140,3 +140,18 @@ app.get('/get-session-exercises', async (req, res) => {
   }
 });
 
+// Route to save session activity
+app.post('/save-activity', async (req, res) => {
+  const { sessionId, duration } = req.body;
+  try {
+      // Insert the activity into the activities table
+      await sql`
+          INSERT INTO activities (session_id, duration)
+          VALUES (${sessionId}, ${duration})
+      `;
+      res.json({ success: true });
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+  }
+});
