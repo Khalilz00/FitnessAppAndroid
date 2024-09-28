@@ -1,10 +1,9 @@
 package model
 
-import java.time.LocalDateTime
 
 data class ActivitySubmission(
     val sessionId: Int,
-    val date: LocalDateTime,
+    val date: String,
     val duration: Int,
     val notes: String? = null
 )

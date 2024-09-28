@@ -275,7 +275,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                                 sessionId = sessionId?.toInt() ?: 0,  // Handle nullability of sessionId
                                 duration = elapsedTime.toInt(),
                                 notes = "No notes",
-                                date = currentDate
+                                date = currentDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                             )
 
                             RetrofitClient.apiService.saveSessionActivity(activityData).enqueue(object :

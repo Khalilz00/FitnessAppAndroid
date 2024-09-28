@@ -109,12 +109,7 @@ fun ElevatedCardExample(activity: Activity) {
     var sessionName by remember { mutableStateOf(activity.session_name) }
 
     // Format the date string
-    val formattedDate = try {
-        val parsedDate = LocalDateTime.parse(activity.date, DateTimeFormatter.ISO_DATE_TIME)
-        parsedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-    } catch (e: Exception) {
-        "Unknown Date"
-    }
+    val formattedDate = activity.date ?: "Unknown Date"
 
     // Format the duration (assuming duration is in seconds)
     val hours = activity.duration / 3600
