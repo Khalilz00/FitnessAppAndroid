@@ -17,17 +17,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -49,6 +53,64 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 @Composable
+fun BottomNavigationItem(logoValue: Int, route: String, navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    TextButton(
+        onClick = { navController.navigate(route) },
+    ) {
+        Icon(
+            painter = painterResource(id = logoValue),
+            contentDescription = "Home",
+            tint = if (currentRoute == route) MaterialTheme.colorScheme.primary else Color.LightGray
+        )
+    }
+
+}
+@Composable
+fun ContentBottomAppBar(navController: NavHostController ,modifier: Modifier = Modifier) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .fillMaxHeight(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        // Centers the content vertically in the Row
+        //modifier = Modifier.fillMaxSize().fillMaxHeight()  //.wrapContentSize()
+    ) {
+        //Surface(
+        //    //circle shape if route is selected
+        //    shape = CircleShape,
+        //    color = if (currentRoute == "home") MaterialTheme.colorScheme.inversePrimary else Color.Transparent,
+        //) {}
+        BottomNavigationItem(R.drawable.baseline_home_24, "home", navController)
+        BottomNavigationItem(R.drawable.baseline_insert_chart_24, "stats", navController)
+        AddFloatingActionButton(
+            modifier = Modifier
+                .size(50.dp)
+        )
+        BottomNavigationItem(R.drawable.baseline_view_list_24, "sessions", navController)
+        BottomNavigationItem(R.drawable.baseline_account_circle_24, "account", navController)
+    }
+}
+@Composable
+fun AddFloatingActionButton(modifier: Modifier = Modifier) {
+    FloatingActionButton(
+        onClick = { /* FAB click action */ },
+        shape = CircleShape,
+        containerColor = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+        //.absoluteOffset(y = (0).dp) // Adjust the FAB position vertically (overlaps the BottomAppBar)
+    ) {
+        Icon(
+            Icons.Filled.Add,
+            contentDescription = "Add",
+            tint = Color.White
+
+        )
+    }
+}
+@Composable
 fun MainScreen(){
     val navController = rememberNavController()
     Scaffold(
@@ -63,54 +125,48 @@ fun MainScreen(){
 }
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
+
+
     BottomAppBar(
         modifier = Modifier
-            .height(80.dp) // Adjust height as needed
-            .padding(bottom = 15.dp, start = 40.dp, end = 40.dp)
-            .clip(RoundedCornerShape(40.dp)),
+
+            .height(100.dp) // Adjust height as needed
+            //Arrange content centered vertically
+
+            .padding(
+                bottom = 25.dp,
+                start = 40.dp,
+                end = 40.dp
+            )
+            .clip(
+                RoundedCornerShape(
+                    //topStart = 30.dp,
+                    //topEnd = 30.dp
+                    40.dp
+                )
+            ),            //.fillMaxHeight(),
+        //
         contentColor = MaterialTheme.colorScheme.onPrimary,
-        containerColor = Color.Gray  // Background color
+        containerColor = Color.Gray // Background color
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically  // Ensure icons are centered vertically
-        ) {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
+        Box(
+            modifier = Modifier
+                    //center content vertically in the box
+                .padding(top = (15).dp)
+                .align(Alignment.CenterVertically),
 
-            // Home Button
-            TextButton(onClick = { navController.navigate("home") }) {
-                Icon(
-                    imageVector = Icons.Filled.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(30.dp),  // Increase icon size
-                    tint = if (currentRoute == "home") MaterialTheme.colorScheme.primary else Color.LightGray
-                )
+            content =
+            {
+                ContentBottomAppBar(navController)
             }
 
-            // Sessions Button
-            TextButton(onClick = { navController.navigate("sessions") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_view_list_24),
-                    contentDescription = "Sessions",
-                    modifier = Modifier.size(30.dp),  // Increase icon size
-                    tint = if (currentRoute == "sessions") MaterialTheme.colorScheme.primary else Color.LightGray
-                )
-            }
-
-            // Account Button
-            TextButton(onClick = { navController.navigate("account") }) {
-                Icon(
-                    imageVector = Icons.Filled.AccountCircle,
-                    contentDescription = "Account",
-                    modifier = Modifier.size(30.dp),  // Increase icon size
-                    tint = if (currentRoute == "account") MaterialTheme.colorScheme.primary else Color.LightGray
-                )
-            }
-        }
+        )
     }
+
+
 }
+
+
 
 @Composable
 fun NavigationHost(navController: NavHostController, paddingValues: PaddingValues) {
