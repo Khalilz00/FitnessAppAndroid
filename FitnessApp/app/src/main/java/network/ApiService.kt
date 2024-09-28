@@ -34,5 +34,9 @@ interface ApiService {
     @GET("/get-session/{id}")
     fun getSession(@Path("id") sessionId: String): Call<Session>
 
+    @GET("/get-session-exercises")
+    fun getSessionExercises(@Query("sessionId") sessionId: String): Call<List<Exercise>>
+
+
 
 }

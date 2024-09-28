@@ -10,6 +10,11 @@ const sql = postgres('postgres://fitnessapp:test@localhost:5432/fitness');
 // Middleware to parse JSON body
 app.use(bodyParser.json());
 
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
 // Fetch all sessions
 async function getSessions() {
   const sessions = await sql`SELECT * FROM session`;
@@ -119,7 +124,19 @@ app.get('/get-images', async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+
+
+// Backend endpoint for fetching exercises of a session
+app.get('/get-session-exercises', async (req, res) => {
+  const { sessionId } = req.query;
+  try {
+      const exercises = await sql`SELECT e.* FROM exercise e
+          JOIN session_exercise se ON e.id = se.exercise_id
+          WHERE se.session_id = ${sessionId}`;
+      res.json(exercises);
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+  }
 });
+

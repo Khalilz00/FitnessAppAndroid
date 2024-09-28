@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,12 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import kotlinx.coroutines.delay
+import model.Exercise
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Locale
 
 
@@ -50,6 +62,10 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
     var startTime by remember { mutableStateOf(0L) }
     var timerRunning by remember { mutableStateOf(false) }
     var currentTime by remember { mutableStateOf(0L) }
+
+    var exercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
+
+    var sessionComplete by remember { mutableStateOf(false) }
 
     LaunchedEffect(timerRunning) {
         if(timerRunning)  {
@@ -69,6 +85,33 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
     val seconds = (elapsedTime % 60)
 
     val formattedTime = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    var currentExerciseIndex by remember { mutableStateOf(0) }
+
+    // Fetch exercises for the session
+    LaunchedEffect(sessionId) {
+        sessionId?.let {
+            RetrofitClient.apiService.getSessionExercises(it).enqueue(object :
+                Callback<List<Exercise>> {
+                override fun onResponse(call: Call<List<Exercise>>, response: Response<List<Exercise>>) {
+                    if (response.isSuccessful) {
+                        exercises = response.body() ?: emptyList()
+                    }
+                }
+                override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+                    // Handle error
+                }
+            })
+        }
+    }
+
+    fun onDoneClicked() {
+        if (currentExerciseIndex < exercises.size - 1) {
+            currentExerciseIndex++
+        } else {
+            timerRunning = false
+            sessionComplete = true
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -123,6 +166,20 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                     textAlign = TextAlign.Center
                 )
 
+
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(exercises) { exercise ->
+                    val isCurrent = exercises.indexOf(exercise) == currentExerciseIndex
+
+                   ExerciseElement(exercise = exercise, isCurrent = isCurrent , onDoneClicked = {
+                       onDoneClicked()
+                   })
+                }
             }
         }
 
@@ -167,6 +224,158 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                 }
             }
         }
+
+        if (sessionComplete) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .align(Alignment.Center)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .padding(32.dp)
+                        .align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Bravo! You did it!",
+                        fontSize = 24.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Session Time: $formattedTime",
+                        fontSize = 18.sp,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(50.dp))
+                    IconButton(
+                        onClick = { sessionComplete = false },  // Close dialog
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Text(
+                            text = "OK",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 
+}
+
+
+
+@Composable
+fun ExerciseElement(exercise: Exercise, isCurrent: Boolean, onDoneClicked: () -> Unit) {
+    val backgroundColor = if (isCurrent) MaterialTheme.colorScheme.primary else Color.LightGray
+
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = if (isCurrent) Alignment.CenterHorizontally else Alignment.Start
+        ) {
+            val painter = if (exercise.image!!.isNotEmpty()) {
+                rememberAsyncImagePainter(
+                    model = exercise.image,
+                    imageLoader = LocalContext.current.imageLoader.newBuilder()
+                        .allowHardware(false)
+                        .build()
+                )
+            } else {
+                painterResource(id = R.drawable.squat)
+            }
+
+            if (isCurrent) {
+                // Centered Image
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Centered Name
+                Text(
+                    text = exercise.name,
+                    fontSize = 22.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Instructions aligned to the start
+                Text(
+                    text = exercise.instructions ?: "No instructions available",
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Centered Done button
+                IconButton(
+                    onClick = { onDoneClicked() },
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.secondary)
+                ) {
+                    Text(
+                        text = "Done",
+                        color = Color.White,
+                        modifier = Modifier.padding(8.dp),
+                        fontSize = 16.sp
+                    )
+                }
+            } else {
+                // Compact view for non-current exercises
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Text(
+                        text = exercise.name,
+                        fontSize = 18.sp,
+                        color = if (isCurrent) Color.White else Color.Black,
+                    )
+                }
+            }
+        }
+    }
 }
