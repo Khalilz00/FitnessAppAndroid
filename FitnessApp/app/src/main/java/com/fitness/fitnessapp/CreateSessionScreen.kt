@@ -163,12 +163,12 @@ fun CreateSessionScreen() {
 
     fun createSession(){
 
-        val finalImageUrl = if (selectedImageUrl.isNotEmpty()) selectedImageUrl else 
+        val finalImageUrl = if (selectedImageUrl.isNotEmpty()) selectedImageUrl else "https://web-back.perfectgym.com/sites/default/files/styles/460x/public/equipment%20%286%29.jpg?itok=bC0T32-K"
 
         val sessionData = SessionRequest(
             sessionTitle = sessionTitle,
             exercises= selectedExercises.map { it.id },
-            image_url = selectedImageUrl
+            image_url = finalImageUrl
 
         )
 
