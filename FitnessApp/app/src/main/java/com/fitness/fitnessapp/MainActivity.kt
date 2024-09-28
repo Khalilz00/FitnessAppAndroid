@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.fitness.fitnessapp.ui.theme.FitnessAppTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -15,6 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            FitnessAppTheme(dynamicColor = false) {
            var showSplash by remember { mutableStateOf(true) }
             if (showSplash) {
                 SplashScreen {
@@ -22,6 +24,7 @@ class MainActivity : ComponentActivity() {
                 }
             } else {
                 MainScreen()
+            }
             }
         }
     }
