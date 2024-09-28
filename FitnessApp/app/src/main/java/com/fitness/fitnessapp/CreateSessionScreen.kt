@@ -163,9 +163,12 @@ fun CreateSessionScreen() {
 
     fun createSession(){
 
+        val finalImageUrl = if (selectedImageUrl.isNotEmpty()) selectedImageUrl else 
+
         val sessionData = SessionRequest(
             sessionTitle = sessionTitle,
             exercises= selectedExercises.map { it.id },
+            image_url = selectedImageUrl
 
         )
 

@@ -1,0 +1,22 @@
+version: '3.3'
+
+services:
+  postgres:
+    container_name: postgres
+    # image: postgres:13-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_DB: fitness
+      POSTGRES_USER: fitnessapp
+      POSTGRES_PASSWORD: test
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
+

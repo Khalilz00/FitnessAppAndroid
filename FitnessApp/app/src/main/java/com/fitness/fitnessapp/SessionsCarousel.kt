@@ -127,7 +127,7 @@ fun SessionCard(session: Session, navController: NavController){
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.squat),
+                painter = rememberAsyncImagePainter(session.image_url),
                 contentDescription = session.name,
                 modifier = Modifier
                     .size(70.dp)

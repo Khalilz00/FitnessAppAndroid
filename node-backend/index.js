@@ -84,12 +84,12 @@ app.get('/get-exercises-by-muscle', async (req, res) => {
 
 // Route to create a session
 app.post('/create-session', async (req, res) => {
-  const { sessionTitle, exercises } = req.body;
+  const { sessionTitle, exercises, image_url } = req.body;
   try {
-    // Insert the session name into the "session" table
+    // Insert the session name and image URL into the "session" table
     const session = await sql`
-      INSERT INTO session (name)
-      VALUES (${sessionTitle})
+      INSERT INTO session (name, image_url)
+      VALUES (${sessionTitle}, ${image_url})
       RETURNING id
     `;
 
@@ -107,7 +107,7 @@ app.post('/create-session', async (req, res) => {
   }
 });
 
-
+// Route to fetch images
 app.get('/get-images', async (req, res) => {
   try {
     const images = await sql`SELECT url FROM images`; // Assuming `sql` is your postgres connection

@@ -9,6 +9,7 @@ import model.SessionRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -29,6 +30,9 @@ interface ApiService {
 
     @GET("/get-images")
     fun getImages(): Call<List<String>>
+
+    @GET("/get-session/{id}")
+    fun getSession(@Path("id") sessionId: String): Call<Session>
 
 
 }
