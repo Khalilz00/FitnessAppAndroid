@@ -2,6 +2,7 @@ package com.fitness.fitnessapp
 
 import android.net.Uri
 import android.widget.Space
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -115,6 +117,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
         } else {
             timerRunning = false
             sessionComplete = true
+            currentExerciseIndex++
         }
     }
 
@@ -180,7 +183,16 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
 
             }
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(25.dp))
+
+            ProgressBar(
+                currentIndex = currentExerciseIndex,
+                totalItems = exercises.size,
+                modifier = Modifier.padding(vertical = 16.dp)
+
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
@@ -425,3 +437,28 @@ fun ExerciseElement(exercise: Exercise, isCurrent: Boolean, onDoneClicked: () ->
         }
     }
 }
+
+@Composable
+fun ProgressBar(currentIndex: Int, totalItems: Int, modifier: Modifier = Modifier) {
+
+    val targetFraction = if (currentIndex == totalItems) 1f else currentIndex.toFloat() / totalItems
+
+    // Use animateFloatAsState to animate the fraction change
+    val animatedFraction by animateFloatAsState(targetValue = targetFraction)
+
+    // Decrease the bar height and add rounded corners
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(10.dp)  // Decreased height to 10.dp
+            .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(animatedFraction)  // Use animatedFraction for smooth transition
+                .height(10.dp)  // Decreased height to 10.dp
+                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(10.dp))
+        )
+    }
+}
+
