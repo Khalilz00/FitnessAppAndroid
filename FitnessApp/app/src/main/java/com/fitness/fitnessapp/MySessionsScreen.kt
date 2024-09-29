@@ -1,5 +1,6 @@
 package com.fitness.fitnessapp
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,21 +26,32 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 
 import model.Exercise
 import model.Session
+import network.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.math.exp
 
 var sessionList: List<Session> = listOf(
     Session(
@@ -96,7 +108,13 @@ fun SessionTitle(title: String) {
     )
 }
 @Composable
-fun cardContent(session: Session, expanded: Boolean, modifier: Modifier = Modifier) {
+fun cardContent(
+    session: Session,
+    expanded: Boolean,
+    exercises: List<Exercise>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -105,21 +123,31 @@ fun cardContent(session: Session, expanded: Boolean, modifier: Modifier = Modifi
     ) {
         Text(
             text = session.name,
-            style = TextStyle(fontSize = 18.sp),
+            style = TextStyle(fontSize = 18.sp , fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth()
         )
 
         if (expanded) {
-            exerciseList.forEach { exercise ->
+            if (exercises.isNotEmpty()) {
+                exercises.forEachIndexed { index, exercise ->
+                    Text(
+                        text = "${index + 1}. ${exercise.name}",
+                        style = TextStyle(fontSize = 16.sp),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                }
+
+            } else {
                 Text(
-                    text = exercise.name,
+                    text = "Loading exercises...",
                     style = TextStyle(fontSize = 16.sp),
-                    textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )
-
             }
+
             Surface(
                 shape = CircleShape,
                 modifier = Modifier.align(Alignment.End).width(100.dp).height(50.dp),
@@ -127,7 +155,10 @@ fun cardContent(session: Session, expanded: Boolean, modifier: Modifier = Modifi
 
             ) {
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        val encodedImageUrl = Uri.encode(session.image_url)
+                        navController.navigate("start-session/${session.id}/${session.name}/${encodedImageUrl}")
+                    },
                     //fit width to text
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.textButtonColors(
@@ -155,17 +186,43 @@ fun cardContent(session: Session, expanded: Boolean, modifier: Modifier = Modifi
 }
 
 @Composable
-fun SessionCardItem(session: Session, modifier: Modifier = Modifier) {
-    //state value for expandable
-    var expanded = remember { mutableStateOf(false) }
-    //Expandable Card with Image and Text
+fun SessionCardItem(session: Session, navController: NavController, modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    var exercises by remember { mutableStateOf<List<Exercise>>(emptyList()) }
+
+
+    fun fetchExercises() {
+        RetrofitClient.apiService.getSessionExercises(session.id.toString()).enqueue(object : Callback<List<Exercise>> {
+            override fun onResponse(call: Call<List<Exercise>>, response: Response<List<Exercise>>) {
+                if (response.isSuccessful) {
+                    exercises = response.body() ?: emptyList()
+                } else {
+                    println("Failed to fetch exercises: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Exercise>>, t: Throwable) {
+                println("Error fetching exercises: ${t.message}")
+            }
+        })
+    }
+
+    if (expanded && exercises.isEmpty()) {
+        fetchExercises()
+    }
+
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = modifier
             .fillMaxWidth()
             //.clip(RoundedCornerShape(15.dp))
             .padding(6.dp),
-        onClick = { expanded.value = !expanded.value }
+        onClick = {
+            expanded = !expanded
+            if (expanded && exercises.isEmpty()){
+                fetchExercises()
+            }
+        }
     ) {
         Row(
             modifier = Modifier
@@ -173,25 +230,45 @@ fun SessionCardItem(session: Session, modifier: Modifier = Modifier) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Image with url
             Image(
-                painter = painterResource(id = R.drawable.backex),
+                painter = rememberAsyncImagePainter(model = session.image_url ?: R.drawable.backex),
                 contentDescription = "Back Exercise Image",
                 modifier = Modifier
-                    .size(60.dp),
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
 
 
-            cardContent(session, expanded.value)
+            cardContent(session, expanded, exercises, navController)
         }
     }
 }
 
 @Composable
 fun MySessionsScreen(navController: NavController) {
+    var sessions by remember { mutableStateOf<List<Session>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        RetrofitClient.apiService.getSessions().enqueue(object : Callback<List<Session>> {
+            override fun onResponse(call: Call<List<Session>>, response: Response<List<Session>>) {
+                if (response.isSuccessful) {
+                    sessions = response.body() ?: emptyList()
+                    println("Sessions fetched: ${sessions.size}")
+                } else {
+                    println("Failed to fetch sessions: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Session>>, t: Throwable) {
+                println("Error fetching sessions: ${t.message}")
+            }
+        })
+    }
+
     Spacer(modifier = Modifier.width(16.dp))
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -202,16 +279,16 @@ fun MySessionsScreen(navController: NavController) {
     ) {
         SessionTitle(title = "My Sessions")
 
-            LazyColumn(modifier = Modifier.fillMaxWidth(),
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                items(sessions.size) { index ->
+                    val session = sessions[index]
+                    SessionCardItem(session, navController)
+
+                }
                 item {
-                    sessionList.forEach { session ->
-                        SessionCardItem(session)
-                    }
-                // Add padding to scroll till the end
                 Spacer(modifier = Modifier.fillMaxWidth().height(100.dp))
+                }
             }
-        }
     }
 
 
