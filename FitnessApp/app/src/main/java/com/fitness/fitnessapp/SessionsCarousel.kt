@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,12 +83,12 @@ fun SessionsCarousel(navController: NavController) {
         ) {
             Text(
                 text = "My Sessions",
-                fontSize = 24.sp,  // Larger font size
-                //fontWeight = FontWeight.Bold,  // Make the text bold
-                textAlign = TextAlign.Start,  // Align text to the start
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)  // Add some space below the title
+                    .padding(bottom = 16.dp)
             )
 
             LazyRow(
@@ -120,6 +121,7 @@ fun SessionCard(session: Session, navController: NavController){
                 val encodedImageUrl = Uri.encode(session.image_url)
                 navController.navigate("start-session/${session.id}/${session.name}/$encodedImageUrl")
             },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
@@ -156,6 +158,7 @@ fun AddSessionCard(onClick: ()-> Unit){
             .height(150.dp)
             .padding(8.dp),
         shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
 

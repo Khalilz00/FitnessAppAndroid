@@ -29,6 +29,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
@@ -56,8 +58,9 @@ import androidx.navigation.compose.rememberNavController
 fun BottomNavigationItem(logoValue: Int, route: String, navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    TextButton(
+    IconButton(
         onClick = { navController.navigate(route) },
+
     ) {
         Icon(
             painter = painterResource(id = logoValue),
@@ -85,18 +88,18 @@ fun ContentBottomAppBar(navController: NavHostController ,modifier: Modifier = M
         //) {}
         BottomNavigationItem(R.drawable.baseline_home_24, "home", navController)
         BottomNavigationItem(R.drawable.baseline_insert_chart_24, "stats", navController)
-        AddFloatingActionButton(
+        AddFloatingActionButton(navController,
             modifier = Modifier
-                .size(50.dp)
+                .size(30.dp)
         )
         BottomNavigationItem(R.drawable.baseline_view_list_24, "sessions", navController)
         BottomNavigationItem(R.drawable.baseline_account_circle_24, "account", navController)
     }
 }
 @Composable
-fun AddFloatingActionButton(modifier: Modifier = Modifier) {
+fun AddFloatingActionButton(navController: NavHostController,modifier: Modifier = Modifier) {
     FloatingActionButton(
-        onClick = { /* FAB click action */ },
+        onClick = { navController.navigate("create-session") },
         shape = CircleShape,
         containerColor = MaterialTheme.colorScheme.primary,
         modifier = modifier
@@ -147,7 +150,7 @@ fun BottomNavigationBar(navController: NavHostController) {
             ),            //.fillMaxHeight(),
         //
         contentColor = MaterialTheme.colorScheme.onPrimary,
-        containerColor = Color.Gray // Background color
+        containerColor = MaterialTheme.colorScheme.secondary // Background color
     ) {
         Box(
             modifier = Modifier
@@ -186,4 +189,5 @@ fun NavigationHost(navController: NavHostController, paddingValues: PaddingValue
         }
     }
 }
+
 

@@ -43,7 +43,7 @@ fun HomeScreen(navController: NavController){
 
             Text(
                 text = "Welcome back! Let's get moving!",
-                fontSize = 20.sp
+                fontSize = 18.sp
             )
         }
         LazyColumn (
