@@ -160,7 +160,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                 Text(
                     text = sessionName,
                     fontSize = 20.sp,
-                    color = Color.Black,
+
                     modifier = Modifier.weight(1f),  // Take up remaining space
                     textAlign = TextAlign.Start
                 )
@@ -176,7 +176,7 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                 Text(
                     text = formattedTime,
                     fontSize = 24.sp,
-                    color = Color.Black,
+
                     textAlign = TextAlign.Center
                 )
 

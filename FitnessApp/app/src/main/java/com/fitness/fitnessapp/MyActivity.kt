@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
@@ -51,7 +53,7 @@ import java.time.format.DateTimeFormatter
 fun InnerCardRow(modifier: Modifier = Modifier, logoValue: Int, labelValue: String, dataValue: String) {
     Card(
         shape = RoundedCornerShape(15.dp),
-        colors = cardColors(containerColor = Color.White),
+        colors = cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth().padding(10.dp)
     ) {
         Row(
@@ -119,7 +121,8 @@ fun ElevatedCardExample(activity: Activity) {
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier.padding(8.dp),
+        colors = cardColors(containerColor = MaterialTheme.colorScheme.secondary),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -185,7 +188,8 @@ fun MyActivity(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = "My Activity",
-            style = TextStyle(fontSize = 24.sp),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
