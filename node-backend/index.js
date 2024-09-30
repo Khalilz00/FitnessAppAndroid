@@ -1,16 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 const app = express();
 const PORT = 3000;
 const postgres = require('postgres');
 
 // Initialize connection to PostgreSQL
-const sql = postgres('postgres://postgres:xcckqqJaDklVycqMBcwoTUIzbjEqzVxz@junction.proxy.rlwy.net:45630/railway');
+const sql = postgres('postgres://fitnessapp:test@localhost:5432/fitness');
 
 // Middleware to parse JSON body
 app.use(bodyParser.json());
-app.use(cors());
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
