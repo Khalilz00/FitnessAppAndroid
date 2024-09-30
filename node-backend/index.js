@@ -1,15 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const PORT = 3000;
 const postgres = require('postgres');
 
 // Initialize connection to PostgreSQL
-const sql = postgres('postgres://fitnessapp:test@localhost:5432/fitness');
+const sql = postgres('postgres://postgres:xcckqqJaDklVycqMBcwoTUIzbjEqzVxz@junction.proxy.rlwy.net:45630/railway');
 
 // Middleware to parse JSON body
 app.use(bodyParser.json());
-
+app.use(cors());
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
@@ -140,16 +141,42 @@ app.get('/get-session-exercises', async (req, res) => {
   }
 });
 
-// Route to save session activity
+// Updated route to save session activity
 app.post('/save-activity', async (req, res) => {
-  const { sessionId, duration } = req.body;
+  const { sessionId, duration, notes , date} = req.body;
   try {
       // Insert the activity into the activities table
       await sql`
-          INSERT INTO activities (session_id, duration)
-          VALUES (${sessionId}, ${duration})
+          INSERT INTO activities (session_id, duration, notes , date)
+          VALUES (${sessionId}, ${duration}, ${notes} , ${date})
       `;
       res.json({ success: true });
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+  }
+});
+
+
+app.get('/get-session/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      const session = await sql`SELECT * FROM session WHERE id = ${id}`;
+      res.json(session);
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+  }
+});
+
+app.get('/get-activities', async (req, res) => {
+  try {
+      const activities = await sql`
+          SELECT a.*, s.name AS session_name, s.image_url AS session_image
+          FROM activities a
+          JOIN session s ON a.session_id = s.id
+      `;
+      res.json(activities);
   } catch (err) {
       console.error(err);
       res.status(500).send('Server error');
