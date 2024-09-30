@@ -87,7 +87,7 @@ fun ContentBottomAppBar(navController: NavHostController ,modifier: Modifier = M
         //    color = if (currentRoute == "home") MaterialTheme.colorScheme.inversePrimary else Color.Transparent,
         //) {}
         BottomNavigationItem(R.drawable.baseline_home_24, "home", navController)
-        BottomNavigationItem(R.drawable.baseline_insert_chart_24, "stats", navController)
+        BottomNavigationItem(R.drawable.baseline_insert_chart_24, "charts", navController)
         AddFloatingActionButton(navController,
             modifier = Modifier
                 .size(30.dp)
@@ -155,7 +155,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         Box(
             modifier = Modifier
                     //center content vertically in the box
-                .padding(top = (15).dp)
+                .padding(top = (11).dp)
                 .align(Alignment.CenterVertically),
 
             content =
@@ -178,6 +178,7 @@ fun NavigationHost(navController: NavHostController, paddingValues: PaddingValue
         startDestination = "home"
     ) {
         composable("home") { HomeScreen(navController) }
+        composable("charts") { MyChartsScreen(navController) }
         composable("account") { AccountScreen(navController) }
         composable("sessions") { MySessionsScreen(navController) }
         composable("create-session") { CreateSessionScreen() }

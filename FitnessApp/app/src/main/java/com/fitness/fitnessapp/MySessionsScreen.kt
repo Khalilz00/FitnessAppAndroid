@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -123,7 +124,7 @@ fun cardContent(
     ) {
         Text(
             text = session.name,
-            style = TextStyle(fontSize = 18.sp , fontWeight = FontWeight.Bold),
+            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth()
         )
@@ -147,7 +148,6 @@ fun cardContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
             Surface(
                 shape = CircleShape,
                 modifier = Modifier.align(Alignment.End).width(100.dp).height(50.dp),
@@ -230,18 +230,28 @@ fun SessionCardItem(session: Session, navController: NavController, modifier: Mo
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Image with url
             Image(
                 painter = rememberAsyncImagePainter(model = session.image_url ?: R.drawable.backex),
                 contentDescription = "Back Exercise Image",
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(RoundedCornerShape(10.dp)),
+                    .clip(RoundedCornerShape(15.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
 
 
             cardContent(session, expanded, exercises, navController)
+
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_expand_more_24),
+                    contentDescription = "Expand",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                )
+
         }
     }
 }
