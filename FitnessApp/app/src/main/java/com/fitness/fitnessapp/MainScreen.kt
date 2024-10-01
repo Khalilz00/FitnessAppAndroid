@@ -149,9 +149,17 @@ fun BottomNavigationBar(navController: NavHostController) {
                     //topEnd = 30.dp
                     40.dp
                 )
-            ),            //.fillMaxHeight(),
+            )
+            .border(
+            width = 1.dp, // Border width
+            color = Color.White, // Border color
+            shape = RoundedCornerShape(40.dp) // Match border shape to BottomAppBar
+        ),
+        //.fillMaxHeight(),
+        tonalElevation = 15.dp,
         //
         contentColor = MaterialTheme.colorScheme.onPrimary,
+
         containerColor = MaterialTheme.colorScheme.secondary // Background color
     ) {
         Box(
