@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,17 +31,106 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+
+
+@Composable
+fun AccountDropdownCard() {
+    var expanded = remember { mutableStateOf(false) }
+    // State to store the selected height and weight
+    var selectedHeight = remember { mutableStateOf(170) } // Default height in cm
+    var selectedWeight = remember { mutableStateOf(70) } // Default weight in kg
+
+    // State to control dropdown menus
+    var heightDropdownExpanded = remember { mutableStateOf(false) }
+    var weightDropdownExpanded = remember { mutableStateOf(false) }
+
+    val heightOptions = (150..220).toList() // Height range from 120 cm to 220 cm
+    val weightOptions = (40..150).toList() // Weight range from 40 kg to 150 kg
+    // Dropdown for Height
+    Text("Select your height (cm)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp))
+    Card(
+        modifier = Modifier.padding(12.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "${selectedHeight.value} cm",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { heightDropdownExpanded.value = true }
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(16.dp),
+
+
+            )
+            DropdownMenu(
+                expanded = heightDropdownExpanded.value,
+                onDismissRequest = { heightDropdownExpanded.value = false },
+            ) {
+                heightOptions.forEach { height ->
+                    DropdownMenuItem(
+                        text = {
+                            Text("${height} cm")
+                        },
+                        onClick = {
+                            selectedHeight.value = height
+                            heightDropdownExpanded.value = false
+                        },
+
+                        )
+                }
+            }
+        }
+
+    }
+    Text("Select your weight (kg)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp))
+    Card(modifier = Modifier.padding(12.dp)) {
+        // Dropdown for Weight
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "${selectedWeight.value} kg",  // Display the selected weight value
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { weightDropdownExpanded.value = true }
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(16.dp)
+            )
+            DropdownMenu(
+                expanded = weightDropdownExpanded.value,
+                onDismissRequest = { weightDropdownExpanded.value = false },
+            ) {
+                weightOptions.forEach { weight ->
+                    DropdownMenuItem(
+                        text = {
+                            Text("${weight} kg")  // Show weight values in the dropdown
+                        },
+                        onClick = {
+                            selectedWeight.value = weight  // Set selected weight
+                            weightDropdownExpanded.value = false  // Close dropdown after selection
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 
 @Composable
@@ -68,24 +158,17 @@ fun AccountCardItem(labelValue: String, logoValue: Int, modifier: Modifier = Mod
     //state value for expandable
     var expanded = remember { mutableStateOf(false) }
     //Expandable Card with Image and Text
-    // State to store the selected height and weight
-    var selectedHeight = remember { mutableStateOf(170) } // Default height in cm
-    var selectedWeight = remember { mutableStateOf(70) } // Default weight in kg
 
-    // State to control dropdown menus
-    var heightDropdownExpanded = remember { mutableStateOf(false) }
-    var weightDropdownExpanded = remember { mutableStateOf(false) }
-
-    // List of values for height (in cm) and weight (in kg)
-    val heightOptions = (120..220).toList() // Height range from 120 cm to 220 cm
-    val weightOptions = (40..150).toList() // Weight range from 40 kg to 150 kg
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = modifier
             .fillMaxWidth(),
             //.clip(RoundedCornerShape(15.dp))
             //.padding(6.dp),
-        onClick = { expanded.value = !expanded.value }
+        onClick = { expanded.value = !expanded.value },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondary
+        )
 
     ) {
         Row(
@@ -103,7 +186,8 @@ fun AccountCardItem(labelValue: String, logoValue: Int, modifier: Modifier = Mod
                     .clip(RoundedCornerShape(15.dp))
                     .padding(4.dp),
 
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
 
             Spacer(modifier = Modifier.width(6.dp))
@@ -125,6 +209,17 @@ fun AccountCardItem(labelValue: String, logoValue: Int, modifier: Modifier = Mod
 fun AccountExpandableCardItem(labelValue: String, logoValue: Int, modifier: Modifier = Modifier) {
     //state value for expandable
     var expanded = remember { mutableStateOf(false) }
+    // State to store the selected height and weight
+    var selectedHeight = remember { mutableStateOf(170) } // Default height in cm
+    var selectedWeight = remember { mutableStateOf(70) } // Default weight in kg
+
+    // State to control dropdown menus
+    var heightDropdownExpanded = remember { mutableStateOf(false) }
+    var weightDropdownExpanded = remember { mutableStateOf(false) }
+
+    // List of values for height (in cm) and weight (in kg)
+    val heightOptions = (120..220).toList() // Height range from 120 cm to 220 cm
+    val weightOptions = (40..150).toList() // Weight range from 40 kg to 150 kg
     //Expandable Card with Image and Text
     Card(
         shape = RoundedCornerShape(15.dp),
@@ -132,7 +227,10 @@ fun AccountExpandableCardItem(labelValue: String, logoValue: Int, modifier: Modi
             .fillMaxWidth(),
         //.clip(RoundedCornerShape(15.dp))
         //.padding(6.dp),
-        onClick = { expanded.value = !expanded.value }
+        onClick = { expanded.value = !expanded.value },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondary
+        )
 
     ) {
         Row(
@@ -150,7 +248,8 @@ fun AccountExpandableCardItem(labelValue: String, logoValue: Int, modifier: Modi
                     .clip(RoundedCornerShape(15.dp))
                     .padding(4.dp),
 
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
 
             Spacer(modifier = Modifier.width(6.dp))
@@ -168,56 +267,17 @@ fun AccountExpandableCardItem(labelValue: String, logoValue: Int, modifier: Modi
         }
         if (expanded.value) {
             // Content expanded
-            SliderHeight()
+            //SliderHeight()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AccountDropdownCard()
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Dropdown menu with
         }
     }
 }
 
-
-@Composable
-fun InnerCardColumnAccountWithLogo(modifier: Modifier = Modifier, logoValue: Int, labelValue:String) {
-    // Personal Notes
-    Card(
-        shape = RoundedCornerShape(15.dp),
-        colors = cardColors(
-            containerColor = Color.LightGray,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-
-
-
-    ) {
-        // Use Column to stack elements vertically
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp) // Adjust padding
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp) // Padding for spacing between the icon/label and the personal notes
-            ) {
-                Icon(
-                    modifier = Modifier.padding(start = 5.dp),
-                    painter = painterResource(id = logoValue),
-                    contentDescription = logoValue.toString()
-                )
-                Text(
-                    text = labelValue,
-                    style = TextStyle(fontSize = 18.sp),
-                    modifier = Modifier
-                        .padding(start = 12.dp)
-                )
-            }
-
-        }
-    }
-}
 
 @Composable
 fun AccountScreen(navController: NavController){
@@ -273,8 +333,8 @@ fun AccountScreen(navController: NavController){
         }
         item {
             AccountCardItem(
-                logoValue = R.drawable.baseline_schedule_24,
-                labelValue = "Total Time",
+                logoValue = R.drawable.baseline_library_add_check_24,
+                labelValue = "My goals",
 
             )
         }
