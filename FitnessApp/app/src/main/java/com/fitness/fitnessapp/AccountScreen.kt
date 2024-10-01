@@ -68,6 +68,17 @@ fun AccountCardItem(labelValue: String, logoValue: Int, modifier: Modifier = Mod
     //state value for expandable
     var expanded = remember { mutableStateOf(false) }
     //Expandable Card with Image and Text
+    // State to store the selected height and weight
+    var selectedHeight = remember { mutableStateOf(170) } // Default height in cm
+    var selectedWeight = remember { mutableStateOf(70) } // Default weight in kg
+
+    // State to control dropdown menus
+    var heightDropdownExpanded = remember { mutableStateOf(false) }
+    var weightDropdownExpanded = remember { mutableStateOf(false) }
+
+    // List of values for height (in cm) and weight (in kg)
+    val heightOptions = (120..220).toList() // Height range from 120 cm to 220 cm
+    val weightOptions = (40..150).toList() // Weight range from 40 kg to 150 kg
     Card(
         shape = RoundedCornerShape(15.dp),
         modifier = modifier
@@ -158,6 +169,8 @@ fun AccountExpandableCardItem(labelValue: String, logoValue: Int, modifier: Modi
         if (expanded.value) {
             // Content expanded
             SliderHeight()
+
+            // Dropdown menu with
         }
     }
 }

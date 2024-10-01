@@ -96,13 +96,14 @@ fun SessionsCarousel(navController: NavController) {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(sessions) { session ->
+                items(sessions.reversed()) { session ->
                     SessionCard(session, navController)
                 }
                 item {
                     AddSessionCard(onClick = {
                         navController.navigate("create-session")
                     })
+
                 }
             }
         }

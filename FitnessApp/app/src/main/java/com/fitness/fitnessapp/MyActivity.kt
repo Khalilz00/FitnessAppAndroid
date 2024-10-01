@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -106,7 +107,7 @@ fun InnerCardColumn(modifier: Modifier = Modifier, logoValue: Int, labelValue: S
 }
 
 @Composable
-fun ElevatedCardExample(activity: Activity) {
+fun MyActivityCard(activity: Activity) {
     var sessionImage by remember { mutableStateOf(activity.session_image) }
     var sessionName by remember { mutableStateOf(activity.session_name) }
 
@@ -137,7 +138,7 @@ fun ElevatedCardExample(activity: Activity) {
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = sessionName ?: "Unknown Session",
-                style = TextStyle(fontSize = 24.sp, color = Color.DarkGray),
+                style = TextStyle(fontSize = 24.sp),
                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 textAlign = TextAlign.Left
             )
@@ -181,6 +182,7 @@ fun MyActivity(modifier: Modifier = Modifier) {
                 println("Error fetching activities: ${t.message}")
             }
         })
+
     }
 
     Column(
@@ -194,11 +196,13 @@ fun MyActivity(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
         LazyRow(modifier = modifier.fillMaxWidth()) {
-            items(activities.size) { index ->
-                val item = activities[index]
-                ElevatedCardExample(item)
+            var activitesReversed = activities.reversed()
+            items(activitesReversed.size) { index ->
+                val item = activitesReversed[index]
+                MyActivityCard(item)
             }
         }
+        Spacer(modifier = Modifier.height(100.dp).fillMaxWidth())
     }
 }
 

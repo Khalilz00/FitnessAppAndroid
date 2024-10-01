@@ -204,6 +204,10 @@ fun StartSessionScreen(sessionId: String?, sessionName: String , imageUrl: Strin
                    ExerciseElement(exercise = exercise, isCurrent = isCurrent , onDoneClicked = {
                        onDoneClicked()
                    })
+
+                }
+                item {
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }

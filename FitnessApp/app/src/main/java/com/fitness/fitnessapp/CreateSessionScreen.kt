@@ -274,6 +274,7 @@ fun CreateSessionScreen() {
                         val isSelected = selectedExercises.contains(exercise)
                         ExerciseItem( exercise = exercise , isSelected = isSelected , onClick = {toggleExerciseSelection(exercise)})
                     }
+
                 }
             }
 
